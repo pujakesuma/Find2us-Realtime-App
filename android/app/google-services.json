@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1004420086305",
+    "firebase_url": "https://find2us-310796.firebaseio.com",
+    "project_id": "find2us-310796",
+    "storage_bucket": "find2us-310796.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1004420086305:android:db44c9081f41ab802f0160",
+        "android_client_info": {
+          "package_name": "com.find2us"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1004420086305-vb3qh40p7eo15nv8f0qfu7e5vg73blto.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.find2us",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "1004420086305-bn63gjoktd68c8p2m8q7f7b5u41f2en5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAT-Y1ZEFc5hxGPhz9aGN-vAlyW9h8wek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1004420086305-bn63gjoktd68c8p2m8q7f7b5u41f2en5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
