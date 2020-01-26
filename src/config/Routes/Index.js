@@ -1,6 +1,6 @@
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-import {EditProfile, Friend, Loading, Login, Register, ChatScreen} from '../../Screen/Index';
+import {EditProfile, Friend, Loading, Login, Register, ChatScreen, Chat, Profile} from '../../Screen/Index';
 import navigationRouter from './navigationRouter';
 
 const Authentication = createStackNavigator(
@@ -17,9 +17,11 @@ const Authentication = createStackNavigator(
 const AppStack = createStackNavigator(
   {
     App: navigationRouter,
-    EditProfile, //masukkan menu edit dll di stack ini
+    EditProfile: EditProfile, //masukkan menu edit dll di stack ini
     Friend : Friend,
-    ChatScreen : ChatScreen
+    ChatScreen : ChatScreen,
+    Chat: Chat,
+    Profile: Profile
   },
   {
     headerMode: 'none',

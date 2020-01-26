@@ -28,7 +28,7 @@ class Login extends Component {
   componentDidMount = async () => {
     this._isMounted = true;
     await this.getLocation();
-  }
+  };
 
   UNSAFE_componentWillMount() {
     this._isMounted = false;
@@ -69,7 +69,7 @@ class Login extends Component {
     return false;
   };
 
-// SET LOCATION //
+  // SET LOCATION //
   getLocation = async () => {
     const hasLocationPermission = await this.hasLocationPermission();
 
@@ -129,12 +129,19 @@ class Login extends Component {
           console.log('dataa1235', data);
           if (data !== null) {
             let user = Object.values(data);
-            console.log('mimim', user)
+            console.log('mimim', user);
 
             AsyncStorage.setItem('user.email', user[0].email);
             AsyncStorage.setItem('user.name', user[0].name);
-            AsyncStorage.setItem('user.address', user[0].address);
             AsyncStorage.setItem('user.photo', user[0].photo);
+            AsyncStorage.setItem(
+              'user.latitude',
+              JSON.stringify(user[0].latitude),
+            );
+            AsyncStorage.setItem(
+              'user.longitude',
+              JSON.stringify(user[0].longitude),
+            );
           }
         });
 
@@ -151,7 +158,7 @@ class Login extends Component {
           await AsyncStorage.setItem('userid', response.user.uid);
           await AsyncStorage.setItem('user', JSON.stringify(response.user));
 
-          console.log('latitude',response);
+          console.log('latitude', response);
         })
         .catch(error => {
           console.warn(error);
@@ -162,23 +169,33 @@ class Login extends Component {
           });
           ToastAndroid.show(this.state.errorMessage, ToastAndroid.LONG);
         });
-      //Firebase
-      // console.log('handleLogin', this.handleLogin);
-      // const {email, password} = await this.state;
-
-      // firebase.auth().signInWithEmailAndPassword(email, password)
-      //   .then(() => this.props.navigation.navigate('RouteUser', {email: this.state.email}))
-      //   .catch(error => this.setState({errorMessage: error.message}));
     }
-    console.log('handlelogin', this.handleLogin)
+    console.log('handlelogin', this.handleLogin);
   };
 
   render() {
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor="white" barStyle="dark-content" />
+        <View
+          style={{
+            height: 30,
+            flexWrap: 'wrap',
+            alignSelf: 'baseline',
+            marginLeft: 16,
+            marginBottom: 24
+          }}>
+          <Text
+            style={{
+              color: '#7D2941',
+              fontSize: 34,
+              fontFamily: 'AirbnbCerealBold',
+            }}>
+            Welcome back !
+          </Text>
+        </View>
         <View style={styles.form}>
-          <Text>Email</Text>
+          <Text style={styles.labelInput}>Email</Text>
           <TextInput
             placeholder="Email"
             na
@@ -197,7 +214,14 @@ class Login extends Component {
           />
           <TouchableOpacity onPress={this.handleLogin}>
             <View style={styles.button}>
-              <Text style={{color: 'white', fontSize: 15}}>Login</Text>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 15,
+                  fontFamily: 'AirbnbCerealBold',
+                }}>
+                Login
+              </Text>
             </View>
           </TouchableOpacity>
 
@@ -238,12 +262,13 @@ const styles = StyleSheet.create({
   },
   labelInput: {
     marginTop: 16,
+    fontFamily: 'AirbnbCerealBold'
   },
   button: {
     marginTop: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#00A8A8',
+    backgroundColor: '#7D2941',
     height: 48,
     borderRadius: 10,
   },
@@ -256,12 +281,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   btnLogin: {
-    color: '#00A8A8',
+    color: '#7D2941',
     marginLeft: 6,
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontFamily: 'AirbnbCerealBold',
   },
   btnAlready: {
     fontSize: 14,
+    fontFamily: 'AirbnbCerealBold',
   },
 });

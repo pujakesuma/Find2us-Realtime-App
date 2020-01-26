@@ -11,11 +11,11 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   SafeAreaView,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 import {Database, Auth} from '../../config/Firebase/firebase';
 import AsyncStorage from '@react-native-community/async-storage';
-import Icon from 'react-native-vector-icons/Ionicons'
+import Icon from 'react-native-vector-icons/Ionicons';
 import {error} from 'react-native-gifted-chat/lib/utils';
 
 //ini adalah Profile screen
@@ -45,7 +45,6 @@ class Home extends Component {
     });
   };
 
-  
   // onPress={() => this.props.navigation.navigate('Friend',{item})}>
 
   renderItem = ({item}) => {
@@ -53,9 +52,7 @@ class Home extends Component {
       <View style={{}}>
         <View style={{}}>
           <TouchableOpacity
-            onPress={() =>
-              this.props.navigation.navigate('Friend', {item})
-            }>
+            onPress={() => this.props.navigation.navigate('Friend', {item})}>
             <View style={styles.row}>
               <Image source={{uri: item.photo}} style={styles.pic} />
               <View>
@@ -93,15 +90,22 @@ class Home extends Component {
     return (
       <>
         <SafeAreaView style={{flex: 1, backgroundColor: '#ffffff'}}>
-          <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
+          <StatusBar backgroundColor="#541C2C" barStyle="light-content" />
           <View style={styles.header}>
             <Text
               style={{
                 fontSize: 32,
-                color: '#27242C',
+                color: '#ffffff',
                 fontFamily: 'AirbnbCerealExtraBold',
-              }}>Friends</Text>
+              }}>
+              Friends
+            </Text>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate('Profile')}>
+              <Icon name={'md-person'} size={24} color={'#ffffff'} />
+            </TouchableOpacity>
           </View>
+
           {this.state.refreshing === true ? (
             <ActivityIndicator
               size="large"
@@ -115,40 +119,38 @@ class Home extends Component {
               keyExtractor={(item, index) => index.toString()}
             />
           )}
-          {/* <View style={styles.floatingButton}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.handleLogout}>
-            <Text
+          <View
+            style={{
+              width: 60,
+              height: 60,
+              borderRadius: 60 / 2,
+              position: 'absolute',
+              right: '8%',
+              bottom: '2%',
+              backgroundColor: '#7D2941',
+              elevation: 4,
+            }}>
+            <TouchableOpacity
               style={{
-                fontSize: 16,
-                color: 'white',
-                fontFamily: 'AirbnbCerealExtraBold',
-              }}>
-              Update
-            </Text>
-          </TouchableOpacity>
-        </View> */}
+                width: 60,
+                height: 60,
+                borderRadius: 60 / 2,
+                position: 'absolute',
+                justifyContent: 'center',
+              }}
+              onPress={() => this.props.navigation.navigate('Chat')}>
+              <Icon
+                name={'ios-chatboxes'}
+                size={28}
+                style={{alignSelf: 'center'}}
+                color="#ffffff"
+              />
+            </TouchableOpacity>
+          </View>
         </SafeAreaView>
       </>
     );
   }
-  // state = {currentUser: null};
-
-  // componentDidMount() {
-  //   const { currentUser } = firebase.auth()
-  //   this.setState({ currentUser })
-  //   console.log('current user', currentUser)
-  // }
-
-  // handleLogout = async () => {
-  //   try {
-  //     await firebase.auth().signOut();
-  //     this.props.navigation.navigate('Login')
-  //   }catch(e){
-  //     console.log(e)
-  //   }
-  // }
 }
 
 export default Home;
@@ -162,9 +164,10 @@ const styles = StyleSheet.create({
   },
   header: {
     height: 70,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#7D2941',
     flexDirection: 'row',
-    paddingLeft: 20,
+    paddingHorizontal: 24,
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   row: {
@@ -174,7 +177,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     height: 80,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   pic: {
     borderRadius: 30,
@@ -222,5 +225,3 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
 });
-
-

@@ -44,49 +44,46 @@ class ChatScreen extends Component {
 
   //connect firebase when send message
   onSend = async () => {
-      if (this.state.message.length > 0) {
-          let messageId = Database
-            .ref('messages')
-            .child(this.state.userId)
-            .child(this.state.person.id)
-            .push().key;
-        let updates = {};
-        let message = {
-            _id: messageId,
-            text: this.state.message,
-            createdAt: firebase.database.ServerValue.TIMESTAMP,
-            user: {
-                _id: this.state.userId,
-                name: this.state.userName,
-                avatar: this.state.userAvatar,
-            },
-        };
-        console.log('message nya', message)
-        console.log('isi user message', message.user)
+    if (this.state.message.length > 0) {
+      let messageId = Database.ref('messages')
+        .child(this.state.userId)
+        .child(this.state.person.id)
+        .push().key;
+      let updates = {};
+      let message = {
+        _id: messageId,
+        text: this.state.message,
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        user: {
+          _id: this.state.userId,
+          name: this.state.userName,
+          avatar: this.state.userAvatar,
+        },
+      };
+      console.log('message nya', message);
+      console.log('isi user message', message.user);
 
-        updates[
-            'messages/' +
-                this.state.userId +
-                '/' +
-                this.state.person.id +
-                '/' +
-                messageId
-        ] = message;
+      updates[
+        'messages/' +
+          this.state.userId +
+          '/' +
+          this.state.person.id +
+          '/' +
+          messageId
+      ] = message;
 
-        updates[
-            'messages/' +
-            this.state.person.id +
-            '/' +
-            this.state.userId +
-            '/' +
-            messageId
-        ] = message;
+      updates[
+        'messages/' +
+          this.state.person.id +
+          '/' +
+          this.state.userId +
+          '/' +
+          messageId
+      ] = message;
 
-        Database
-            .ref()
-            .update(updates);
-        this.setState({message: ''});
-      }
+      Database.ref().update(updates);
+      this.setState({message: ''});
+    }
   };
 
   renderSend(props) {
@@ -94,14 +91,20 @@ class ChatScreen extends Component {
       <Send {...props} textStyle={{fontFamily: 'AirbnbCerealLight'}}>
         <View
           style={{
-            width: 44,
+            width: 64,
             height: 44,
-            borderRadius: 44/2,
-            backgroundColor:'#05A0E4',
-            justifyContent:'center',
-            alignItems:'center',
+            backgroundColor: 'white',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}>
-          <Icon name={'ios-send'} size={24} color={'white'}/>
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: 'AirbnbCerealExtraBold',
+              color: '#7D2941',
+            }}>
+            Send
+          </Text>
         </View>
       </Send>
     );
@@ -110,22 +113,25 @@ class ChatScreen extends Component {
   render() {
     return (
       <Fragment>
-          <StatusBar backgroundColor="#0487C0" barStyle="light-content" />
+        <StatusBar backgroundColor="#541C2C" barStyle="light-content" />
         <View style={styles.header}>
           <>
             <View style={styles.img}>
-              <Image source={{uri: this.state.person.photo}} style={styles.photo} />
+              <Image
+                source={{uri: this.state.person.photo}}
+                style={styles.photo}
+              />
             </View>
             <View style={{marginLeft: 10}}>
               <Text style={styles.heading}>{this.state.person.name}</Text>
               {this.state.person.status == 'Online' ? (
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                  <Icon name={'ios-disc'} size={10} color={'green'}/>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Icon name={'ios-disc'} size={10} color={'green'} />
                   <Text style={styles.off}>{this.state.person.status}</Text>
                 </View>
               ) : (
-                <View style={{flexDirection:'row',  alignItems:'center'}}>
-                  <Icon name={'ios-disc'} size={10} color={'#C0392B'}/>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Icon name={'ios-disc'} size={10} color={'#C0392B'} />
                   <Text style={styles.off}>{this.state.person.status}</Text>
                 </View>
               )}
@@ -137,7 +143,6 @@ class ChatScreen extends Component {
           renderBubble={this.renderBubble}
           renderSend={this.renderSend}
           text={this.state.message}
-          
           onInputTextChanged={val => {
             this.setState({message: val});
           }}
@@ -155,41 +160,40 @@ class ChatScreen extends Component {
 
 export default ChatScreen;
 
-
 const styles = StyleSheet.create({
-    photo: {
-      flex: 1,
-      width: '100%',
-      resizeMode: 'cover',
-    },
-    img: {
-      backgroundColor: 'silver',
-      width: 41,
-      height: 41,
-      borderRadius: 50,
-      marginHorizontal: 5,
-      justifyContent: 'center',
-      alignItems: 'center',
-      overflow: 'hidden',
-    },
-    heading: {
-      color: 'white',
-      fontSize: 22,
-      width: 'auto',
-      fontFamily: 'AirbnbCerealExtraBold'
-    },
-    header: {
-      backgroundColor: '#05A0E4',
-      height: 80,
-      width: '100%',
-      paddingHorizontal: 12,
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    off:{
-      fontWeight: '200',
-      color: 'whitesmoke',
-      fontSize: 13,
-      paddingLeft: 5
-    },
-  });
+  photo: {
+    flex: 1,
+    width: '100%',
+    resizeMode: 'cover',
+  },
+  img: {
+    backgroundColor: 'silver',
+    width: 41,
+    height: 41,
+    borderRadius: 50,
+    marginHorizontal: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  heading: {
+    color: 'white',
+    fontSize: 22,
+    width: 'auto',
+    fontFamily: 'AirbnbCerealExtraBold',
+  },
+  header: {
+    backgroundColor: '#7D2941',
+    height: 80,
+    width: '100%',
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  off: {
+    fontWeight: '200',
+    color: 'whitesmoke',
+    fontSize: 13,
+    paddingLeft: 5,
+  },
+});

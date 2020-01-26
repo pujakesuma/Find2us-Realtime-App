@@ -11,7 +11,7 @@ import {
   ImageBackground,
   Picker,
   StatusBar,
-  ToastAndroid
+  ToastAndroid,
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import {Database, Auth} from '../../config/Firebase/firebase';
@@ -23,20 +23,32 @@ class Profile extends Component {
     super(props);
     this.state = {
       idUser: null,
+      city: '',
     };
   }
-
-  
 
   componentDidMount = async () => {
     const idUser = await AsyncStorage.getItem('userid');
     const fullName = await AsyncStorage.getItem('user.name');
-    const address = await AsyncStorage.getItem('user.address');
     const avatar = await AsyncStorage.getItem('user.photo');
+    const lat = await AsyncStorage.getItem('user.latitude');
+    const long = await AsyncStorage.getItem('user.longitude');
     console.log('huboo', await idUser);
-    this.setState({idUser, fullName, address, avatar});
+    this.setState({idUser, fullName, avatar, lat, long});
+
+    fetch(
+      'https://us1.locationiq.com/v1/reverse.php?key=d17151587b1e23&lat=' +
+        this.state.lat +
+        '&lon=' +
+        this.state.long +
+        '&format=json',
+    )
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState({city: responseJson.address.state_district});
+      });
   };
-  
+
   handleLogout = async () => {
     await AsyncStorage.getItem('userid')
       .then(async userid => {
@@ -56,7 +68,7 @@ class Profile extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor="#029C9C" barStyle="light-content" />
+        <StatusBar backgroundColor="#541C2C" barStyle="light-content" />
         <View style={styles.header}>
           <View style={styles.photo}>
             <Image
@@ -73,15 +85,13 @@ class Profile extends Component {
               }}>
               {this.state.fullName}
             </Text>
-            {/* </View>
-          <View style={styles.address}> */}
             <Text
               style={{
                 fontSize: 20,
                 color: 'white',
                 fontFamily: 'AirbnbCerealLight',
               }}>
-              {this.state.address}
+              {this.state.city}
             </Text>
           </View>
         </View>
@@ -115,7 +125,9 @@ class Profile extends Component {
             </TouchableOpacity>
           </View>
           <View style={styles.btn}>
-            <TouchableOpacity style={styles.touchBtn} onPress={this.handleLogout}>
+            <TouchableOpacity
+              style={styles.touchBtn}
+              onPress={this.handleLogout}>
               <Text
                 style={{
                   fontSize: 16,
@@ -142,9 +154,11 @@ const styles = StyleSheet.create({
   },
   header: {
     height: '50%',
-    backgroundColor: '#00A8A8',
+    backgroundColor: '#7D2941',
     justifyContent: 'center',
     alignItems: 'center',
+    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 30,
   },
   photo: {
     height: 130,
@@ -157,7 +171,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: '75%',
     marginTop: 10,
-    backgroundColor: '#00A8A8',
+    backgroundColor: '#7D2941',
     justifyContent: 'center',
     alignItems: 'center',
   },

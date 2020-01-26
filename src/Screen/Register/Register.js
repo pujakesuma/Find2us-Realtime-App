@@ -9,12 +9,12 @@ import {
   PermissionsAndroid,
   Platform,
   StyleSheet,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 import {Database, Auth} from '../../config/Firebase/firebase';
-import AsyncStorage from '@react-native-community/async-storage'
+import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from 'react-native-geolocation-service';
-import { error } from 'react-native-gifted-chat/lib/utils';
+import {error} from 'react-native-gifted-chat/lib/utils';
 
 class Register extends Component {
   constructor(props) {
@@ -22,7 +22,6 @@ class Register extends Component {
     this.state = {
       isVisible: false,
       name: '',
-      address: '',
       email: '',
       password: '',
       latitude: null,
@@ -33,13 +32,12 @@ class Register extends Component {
     };
   }
 
-
   //get permissions
   hasLocationPermission = async () => {
     if (
       Platform.OS === 'ios' ||
       (Platform.OS === 'android' && Platform.Version < 23)
-    ){
+    ) {
       return true;
     }
 
@@ -68,7 +66,7 @@ class Register extends Component {
       );
     }
     return false;
-  }
+  };
 
   //get location
   getLocation = async () => {
@@ -97,7 +95,7 @@ class Register extends Component {
           timeout: 8000,
           maximumAge: 8000,
           distanceFilter: 50,
-          forceRequestLocation: true
+          forceRequestLocation: true,
         },
       );
     });
@@ -105,14 +103,14 @@ class Register extends Component {
 
   componentDidMount = async () => {
     await this.getLocation();
-  }
+  };
 
   inputHandler = (name, value) => {
     this.setState(() => ({[name]: value}));
   };
 
   handleRegister = () => {
-    const {email, name, password, address} = this.state;
+    const {email, name, password} = this.state;
     //Validation
     if (name.length < 1) {
       ToastAndroid.show('Please input your fullname', ToastAndroid.LONG);
@@ -127,71 +125,93 @@ class Register extends Component {
         ToastAndroid.LONG,
       );
     } else {
-      Auth.createUserWithEmailAndPassword(email, password).then(response => {
-        console.log('responsee', response)
-        response.user.updateProfile({
-          displayName: this.state.name,
-        });
-        Database.ref('/user/' + response.user.uid)
-          .set({
-            name: this.state.name,
-            address: this.state.address,
-            status: 'Offline',
-            email: this.state.email,
-            photo:
-              'https://www.brettlarkin.com/wp-content/uploads/2017/12/Profile01-RoundedBlack-512-300x300.png',
-            latitude: this.state.latitude,
-            longitude: this.state.longitude,
-            id: response.user.uid,
-          })
-          .catch(error => {
-            ToastAndroid.show(error.message, ToastAndroid.LONG);
-            this.setState({
-              name: '',
-              address: '',
-              email: '',
-              password: '',
+      Auth.createUserWithEmailAndPassword(email, password)
+        .then(response => {
+          console.log('responsee', response);
+          response.user.updateProfile({
+            displayName: this.state.name,
+          });
+          Database.ref('/user/' + response.user.uid)
+            .set({
+              name: this.state.name,
+              status: 'Offline',
+              email: this.state.email,
+              photo:
+                'https://www.brettlarkin.com/wp-content/uploads/2017/12/Profile01-RoundedBlack-512-300x300.png',
+              latitude: this.state.latitude,
+              longitude: this.state.longitude,
+              id: response.user.uid,
+            })
+            .catch(error => {
+              ToastAndroid.show(error.message, ToastAndroid.LONG);
+              this.setState({
+                name: '',
+                email: '',
+                password: '',
+              });
             });
+          ToastAndroid.show('Successfully Registered!', ToastAndroid.LONG);
+          Database.ref('user/')
+            .orderByChild('/email')
+            .equalTo(email)
+            .once('value', result => {
+              let data = result.val();
+              console.log('dataa', data);
+              if (data !== null) {
+                let user = Object.values(data);
+                console.log('data yg mau k', user);
+                AsyncStorage.setItem('user.email', user[0].email);
+                AsyncStorage.setItem('user.name', user[0].name);
+                AsyncStorage.setItem('user.photo', user[0].photo);
+                AsyncStorage.setItem(
+                  'user.latitude',
+                  JSON.stringify(user[0].latitude),
+                );
+                AsyncStorage.setItem(
+                  'user.longitude',
+                  JSON.stringify(user[0].longitude),
+                );
+              }
+            });
+          AsyncStorage.setItem('userid', response.user.uid);
+          AsyncStorage.setItem('user', JSON.stringify(response.user));
+        })
+        .catch(error => {
+          this.setState({
+            errorMessage: error.message,
+            name: '',
+            email: '',
+            password: '',
           });
-        ToastAndroid.show('Successfully Registered!', ToastAndroid.LONG);
-        Database.ref('user/')
-          .orderByChild('/email')
-          .equalTo(email)
-          .once('value', result => {
-            let data = result.val();
-            console.log('dataa', data)
-            if (data !== null) {
-              let user = Object.values(data);
-              console.log('data yg mau k', user)
-              AsyncStorage.setItem('user.email', user[0].email);
-              AsyncStorage.setItem('user.name', user[0].name);
-              AsyncStorage.setItem('user.address', user[0].address);
-              AsyncStorage.setItem('user.photo', user[0].photo);
-            }
-          });
-        AsyncStorage.setItem('userid', response.user.uid);
-        AsyncStorage.setItem('user', JSON.stringify(response.user));
-      })
-      .catch(error => {
-        this.setState({
-          errorMessage: error.message,
-          name: '',
-          address: '',
-          email: '',
-          password: '',
+          ToastAndroid.show(this.state.errorMessage.message, ToastAndroid.LONG);
         });
-        ToastAndroid.show(this.state.errorMessage.message, ToastAndroid.LONG)
-      });
     }
-    console.log('tessss handle', this.handleRegister)
+    console.log('tessss handle', this.handleRegister);
   };
 
   render() {
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor="white" barStyle="dark-content" />
+        <View
+          style={{
+            height: 30,
+            flexWrap: 'wrap',
+            alignSelf: 'baseline',
+            marginLeft: 16,
+            marginBottom: 24
+          }}>
+          <Text
+            style={{
+              color: '#7D2941',
+              fontSize: 34,
+              fontFamily: 'AirbnbCerealBold',
+            }}>
+            Getting Started
+          </Text>
+        </View>
         <View style={styles.form}>
-        <Text>Full Name</Text>
+          <Text style={styles.labelInput}>Full Name</Text>
           <TextInput
             placeholder="Name"
             na
@@ -199,15 +219,7 @@ class Register extends Component {
             style={styles.textInput}
             onChangeText={txt => this.inputHandler('name', txt)}
           />
-          <Text>Address</Text>
-          <TextInput
-            placeholder="Address"
-            na
-            autoCapitalize="words"
-            style={styles.textInput}
-            onChangeText={txt => this.inputHandler('address', txt)}
-          />
-          <Text>Email</Text>
+          <Text style={styles.labelInput}>Email</Text>
           <TextInput
             placeholder="Email"
             na
@@ -226,7 +238,14 @@ class Register extends Component {
           />
           <TouchableOpacity onPress={this.handleRegister}>
             <View style={styles.button}>
-              <Text style={{color: 'white', fontSize: 15}}>Register</Text>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 15,
+                  fontFamily: 'AirbnbCerealBold',
+                }}>
+                Register
+              </Text>
             </View>
           </TouchableOpacity>
 
@@ -262,17 +281,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   form: {
-    width: 250,
+    width: '90%',
     justifyContent: 'center',
   },
   labelInput: {
     marginTop: 16,
+    fontFamily: 'AirbnbCerealBold'
   },
   button: {
     marginTop: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#00A8A8',
+    backgroundColor: '#7D2941',
     height: 48,
     borderRadius: 10,
   },
@@ -285,12 +305,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   btnLogin: {
-    color: '#00A8A8',
+    color: '#7D2941',
     marginLeft: 6,
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: 'AirbnbCerealBold',
   },
   btnAlready: {
     fontSize: 14,
+    fontFamily: 'AirbnbCerealBold',
   },
 });

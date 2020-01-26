@@ -1,8 +1,9 @@
 import React from 'react';
-import {Icon} from 'react-native-elements';
-import {createAppContainer, createSwitchNavigator} from 'react-navigation';
-import {createBottomTabNavigator} from 'react-navigation-tabs';
-import {Chat, Find, Home, Profile} from '../../Screen/Index';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { Find, Home } from '../../Screen/Index';
+
 
 const AppTabNavigator = createBottomTabNavigator(
   {
@@ -10,7 +11,7 @@ const AppTabNavigator = createBottomTabNavigator(
       screen: Home,
       navigationOptions: {
         tabBarIcon: ({tintColor}) => (
-          <Icon name="home" size={20} color={tintColor} />
+          <Icon name={'ios-people'} size={32} color={tintColor} />
         ),
       },
     },
@@ -19,41 +20,18 @@ const AppTabNavigator = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ({tintColor}) => (
           <Icon
-            name="map-marker"
-            type="font-awesome"
-            size={20}
+            name={'ios-map'}
+            size={32}
             color={tintColor}
           />
-        ),
-      },
-    },
-    Chat: {
-      screen: Chat,
-      navigationOptions: {
-        tabBarIcon: ({tintColor}) => (
-          <Icon
-            name="comments"
-            type="font-awesome"
-            size={20}
-            color={tintColor}
-          />
-        ),
-      },
-    },
-
-    Profile: {
-      screen: Profile,
-      navigationOptions: {
-        tabBarIcon: ({tintColor}) => (
-          <Icon name="user" type="font-awesome" size={20} color={tintColor} />
         ),
       },
     },
   },
   {
-    initialRouteName: 'Chat',
+    initialRouteName: 'Home',
     tabBarOptions: {
-      activeTintColor: '#18A4E0',
+      activeTintColor: '#7D2941',
       style: {borderTopWidth: 0, height: 60, paddingVertical: 10}
     },
   },

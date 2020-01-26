@@ -43,13 +43,10 @@ class EditProfile extends Component {
 
       loading: false,
       updatesEnabled: false,
-      // editable: true,
+      editable: true,
       uploading: false,
       dialogVisible: false,
 
-      dob: '',
-      gender: 'Male',
-      phone: '',
     };
 
     // this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
@@ -90,16 +87,6 @@ class EditProfile extends Component {
     const fs = RNFetchBlob.fs;
     window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
     window.Blob = Blob;
-    //   // enable this option so that the response data conversion handled automatically
-    //   auto: true,
-    //   // when receiving response data, the module will match its Content-Type header
-    //   // with strings in this array. If it contains any one of string in this array,
-    //   // the response body will be considered as binary data and the data will be stored
-    //   // in file system instead of in memory.
-    //   // By default, it only store response data to file system when Content-Type
-    //   // contains string `application/octet`.
-    //   binaryContentTypes: ['image/', 'video/', 'audio/', 'foo/'],
-    // }).build();
 
     const options = {
       title: 'Select Avatar',
@@ -126,7 +113,7 @@ class EditProfile extends Component {
       ImagePicker.showImagePicker(options, response => { //option
         console.log('xxx', response);
         ToastAndroid.show(
-          'Rest asure, your photo is flying to the shiny cloud',
+          'Please wait, your photo is being uploaded',
           ToastAndroid.LONG,
         );
         let uploadBob = null;
@@ -147,7 +134,7 @@ class EditProfile extends Component {
           })
           .then(url => {
             ToastAndroid.show(
-              'Your cool avatar is being uploaded, its going back to your phone now',
+              'All set!',
               ToastAndroid.LONG,
             );
             Database
@@ -161,25 +148,11 @@ class EditProfile extends Component {
       });
     }
   };
-  // addData = async () => {
-  //   const {name, dob, address, gender, phone} = this.state
-  //   const uid = firebase.auth().currentUser.uid
-  //   const ref = firebase.database().ref(`/users/${uid}`)
-  //   await ref.set({
-  //     uid,
-  //     name,
-  //     dob,
-  //     address,
-  //     gender,
-  //     phone,
-  //     date: new Date().getTime()
-  //   })
-  // }
 
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor="#029C9C" barStyle="light-content" />
+        <StatusBar backgroundColor="#541C2C" barStyle="light-content"/>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => this.props.navigation.navigate('Profile')}>
             <Icon
@@ -212,7 +185,7 @@ class EditProfile extends Component {
                 <Text
                   style={{
                     fontSize: 18,
-                    color: '#FD866E',
+                    color: '#E75A5F',
                     fontFamily: 'AirbnbCerealBold',
                     paddingLeft: 20,
                   }}>
@@ -252,34 +225,11 @@ class EditProfile extends Component {
                 }}
               />
             </View> */}
-            <View style={styles.btn}>
-              <Text>Address</Text>
-              <TextInput
-                placeholder="Address"
-                style={{
-                  borderBottomWidth: 0.5,
-                  borderColor: 'gray',
-                  height: 40,
-                  paddingLeft: 0,
-                }}
-              />
-            </View>
-            <View style={styles.btn}>
-              <Text>Gender</Text>
-              <TextInput
-                placeholder="Gender"
-                style={{
-                  borderBottomWidth: 0.5,
-                  borderColor: 'gray',
-                  height: 40,
-                  paddingLeft: 0,
-                }}
-              />
-            </View>
+           
             <View style={styles.btn}>
               <Text>Email</Text>
               <TextInput
-                // editable={false}
+                editable={false}
                 value={this.state.userEmail}
                 style={{
                   borderBottomWidth: 0.5,
@@ -289,18 +239,7 @@ class EditProfile extends Component {
                 }}
               />
             </View>
-            <View style={styles.btn}>
-              <Text>Phone</Text>
-              <TextInput
-                placeholder="Phone"
-                style={{
-                  borderBottomWidth: 0.5,
-                  borderColor: 'gray',
-                  height: 40,
-                  paddingLeft: 0,
-                }}
-              />
-            </View>
+
           </View>
         </ScrollView>
         <View style={styles.floatingButton}>
@@ -331,7 +270,7 @@ const styles = StyleSheet.create({
   },
   header: {
     height: 55,
-    backgroundColor: '#00A8A8',
+    backgroundColor: '#7D2941',
     flexDirection: 'row',
     paddingLeft: '6%',
     alignItems: 'center',
@@ -376,7 +315,7 @@ const styles = StyleSheet.create({
     width: '90%',
     height: 45,
     borderRadius: 40,
-    backgroundColor: '#FD866E',
+    backgroundColor: '#7D2941',
     alignSelf: 'center',
     bottom: 0,
     flexDirection: 'row',
@@ -389,7 +328,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FD866E',
+    backgroundColor: '#7D2941',
     width: '100%',
     height: 45,
     borderRadius: 40,

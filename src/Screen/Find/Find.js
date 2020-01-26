@@ -141,7 +141,6 @@ class Find extends Component {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           }}>
-          {/* <Marker coordinate={{latitude: this.state.latitude, longitude: this.state.longitude}}></Marker> */}
           {this.state.userList.map(item => {
             return (
               <Marker
@@ -197,7 +196,7 @@ class Find extends Component {
             <Icon
               name={'ios-locate'}
               size={28}
-              color={'#0487C0'}
+              color={'#7D2941'}
               
             />
           </TouchableOpacity>

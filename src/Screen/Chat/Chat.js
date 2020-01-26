@@ -1,19 +1,18 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import React, {Component} from 'react';
 import {
-  View,
-  Text,
-  FlatList,
   ActivityIndicator,
-  TouchableOpacity,
+  FlatList,
   Image,
-  RefreshControl,
-  StyleSheet,
   SafeAreaView,
   StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {Database, Auth} from '../../config/Firebase/firebase';
-import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {Database} from '../../config/Firebase/firebase';
 
 class Chat extends Component {
   constructor(props) {
@@ -93,7 +92,9 @@ class Chat extends Component {
                 fontSize: 32,
                 color: '#27242C',
                 fontFamily: 'AirbnbCerealExtraBold',
-              }}>Chat</Text>
+              }}>
+              Chat
+            </Text>
           </View>
           {this.state.refreshing === true ? (
             <ActivityIndicator
@@ -108,20 +109,6 @@ class Chat extends Component {
               keyExtractor={(item, index) => index.toString()}
             />
           )}
-          {/* <View style={styles.floatingButton}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.handleLogout}>
-            <Text
-              style={{
-                fontSize: 16,
-                color: 'white',
-                fontFamily: 'AirbnbCerealExtraBold',
-              }}>
-              Update
-            </Text>
-          </TouchableOpacity>
-        </View> */}
         </SafeAreaView>
       </>
     );
@@ -151,7 +138,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     height: 80,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   pic: {
     borderRadius: 30,
