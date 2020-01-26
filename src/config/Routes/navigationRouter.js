@@ -10,7 +10,7 @@ const AppTabNavigator = createBottomTabNavigator(
       screen: Home,
       navigationOptions: {
         tabBarIcon: ({tintColor}) => (
-          <Icon name="home" size={24} color={tintColor} />
+          <Icon name="home" size={20} color={tintColor} />
         ),
       },
     },
@@ -21,7 +21,7 @@ const AppTabNavigator = createBottomTabNavigator(
           <Icon
             name="map-marker"
             type="font-awesome"
-            size={24}
+            size={20}
             color={tintColor}
           />
         ),
@@ -34,7 +34,7 @@ const AppTabNavigator = createBottomTabNavigator(
           <Icon
             name="comments"
             type="font-awesome"
-            size={24}
+            size={20}
             color={tintColor}
           />
         ),
@@ -45,15 +45,16 @@ const AppTabNavigator = createBottomTabNavigator(
       screen: Profile,
       navigationOptions: {
         tabBarIcon: ({tintColor}) => (
-          <Icon name="user" type="font-awesome" size={24} color={tintColor} />
+          <Icon name="user" type="font-awesome" size={20} color={tintColor} />
         ),
       },
     },
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Chat',
     tabBarOptions: {
-      activeTintColor: '#00A8A8',
+      activeTintColor: '#18A4E0',
+      style: {borderTopWidth: 0, height: 60, paddingVertical: 10}
     },
   },
 );

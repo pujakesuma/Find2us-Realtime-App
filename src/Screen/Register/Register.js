@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import {Database, Auth} from '../../config/Firebase/firebase';
 import AsyncStorage from '@react-native-community/async-storage'
+import Geolocation from 'react-native-geolocation-service';
+import { error } from 'react-native-gifted-chat/lib/utils';
 
 class Register extends Component {
   constructor(props) {
@@ -29,6 +31,80 @@ class Register extends Component {
       loading: false,
       updatesEnabled: false,
     };
+  }
+
+
+  //get permissions
+  hasLocationPermission = async () => {
+    if (
+      Platform.OS === 'ios' ||
+      (Platform.OS === 'android' && Platform.Version < 23)
+    ){
+      return true;
+    }
+
+    const hasPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (hasPermission) {
+      return true;
+    }
+
+    const status = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (status === PermissionsAndroid.RESULTS.GRANTED) {
+      return true;
+    }
+    if (status === PermissionsAndroid.RESULTS.DENIED) {
+      ToastAndroid.show(
+        'Location Permission Denied by User',
+        ToastAndroid.LONG,
+      );
+    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      ToastAndroid.show(
+        'Location Permission Revoked by User',
+        ToastAndroid.LONG,
+      );
+    }
+    return false;
+  }
+
+  //get location
+  getLocation = async () => {
+    const hasLocationPermission = await this.hasLocationPermission();
+
+    if (!hasLocationPermission) {
+      return;
+    }
+
+    this.setState({loading: true}, () => {
+      Geolocation.getCurrentPosition(
+        position => {
+          this.setState({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            loading: false,
+          });
+          console.warn(position);
+        },
+        error => {
+          this.setState({errorMessage: error, loading: false});
+          console.warn(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 8000,
+          distanceFilter: 50,
+          forceRequestLocation: true
+        },
+      );
+    });
+  };
+
+  componentDidMount = async () => {
+    await this.getLocation();
   }
 
   inputHandler = (name, value) => {
@@ -63,7 +139,9 @@ class Register extends Component {
             status: 'Offline',
             email: this.state.email,
             photo:
-              'https://atasouthport.com/wp-content/uploads/2017/04/default-image.jpg',
+              'https://www.brettlarkin.com/wp-content/uploads/2017/12/Profile01-RoundedBlack-512-300x300.png',
+            latitude: this.state.latitude,
+            longitude: this.state.longitude,
             id: response.user.uid,
           })
           .catch(error => {
@@ -84,7 +162,7 @@ class Register extends Component {
             console.log('dataa', data)
             if (data !== null) {
               let user = Object.values(data);
-
+              console.log('data yg mau k', user)
               AsyncStorage.setItem('user.email', user[0].email);
               AsyncStorage.setItem('user.name', user[0].name);
               AsyncStorage.setItem('user.address', user[0].address);

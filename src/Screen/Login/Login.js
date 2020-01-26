@@ -8,18 +8,97 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import {Auth, Database} from '../../config/Firebase/firebase';
+import Geolocation from 'react-native-geolocation-service';
 
 class Login extends Component {
   constructor(props) {
     super(props);
+    this._isMounted = false;
     this.state = {
       email: '',
       password: '',
       errorMessage: null,
     };
   }
+
+  componentDidMount = async () => {
+    this._isMounted = true;
+    await this.getLocation();
+  }
+
+  UNSAFE_componentWillMount() {
+    this._isMounted = false;
+    Geolocation.clearWatch();
+    Geolocation.stopObserving();
+  }
+
+  hasLocationPermission = async () => {
+    if (
+      Platform.OS === 'ios' ||
+      (Platform.OS === 'android' && Platform.Version < 23)
+    ) {
+      return true;
+    }
+    const hasPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (hasPermission) {
+      return true;
+    }
+    const status = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (status === PermissionsAndroid.RESULTS.GRANTED) {
+      return true;
+    }
+    if (status === PermissionsAndroid.RESULTS.DENIED) {
+      ToastAndroid.show(
+        'Location Permission Denied By User.',
+        ToastAndroid.LONG,
+      );
+    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      ToastAndroid.show(
+        'Location Permission Revoked By User.',
+        ToastAndroid.LONG,
+      );
+    }
+    return false;
+  };
+
+// SET LOCATION //
+  getLocation = async () => {
+    const hasLocationPermission = await this.hasLocationPermission();
+
+    if (!hasLocationPermission) {
+      return;
+    }
+
+    this.setState({loading: true}, () => {
+      Geolocation.getCurrentPosition(
+        position => {
+          this.setState({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            loading: false,
+          });
+        },
+        error => {
+          this.setState({errorMessage: error});
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 8000,
+          distanceFilter: 50,
+          forceRequestLocation: true,
+        },
+      );
+    });
+  };
 
   handleInput = (name, value) => {
     this.setState(() => ({[name]: value}));
@@ -63,12 +142,16 @@ class Login extends Component {
         .then(async response => {
           Database.ref('/user/' + response.user.uid).update({
             status: 'Online',
+            latitude: this.state.latitude || null,
+            longitude: this.state.longitude || null,
             //place your longitude
           });
 
           ToastAndroid.show('Login success', ToastAndroid.LONG);
           await AsyncStorage.setItem('userid', response.user.uid);
           await AsyncStorage.setItem('user', JSON.stringify(response.user));
+
+          console.log('latitude',response);
         })
         .catch(error => {
           console.warn(error);

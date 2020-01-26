@@ -19,58 +19,169 @@ import {
 import {Icon} from 'react-native-elements';
 import DatePicker from 'react-native-datepicker';
 import firebase from 'firebase';
+import {Database, Auth, Storage} from '../../config/Firebase/firebase';
+
 import AsyncStorage from '@react-native-community/async-storage';
-import RNFetchBlob from 'react-native-fetch-blob';
-import ImagePicker from 'react-native-image-picker'
+import RNFetchBlob from 'rn-fetch-blob';
+import ImagePicker from 'react-native-image-picker';
 
 class EditProfile extends Component {
-//Name, DOB, Address, Gender, Email, Phone
+  //Name, DOB, Address, Gender, Email, Phone
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.state = {
-      uri: '',
-      editable: true,
-      data: {},
+      userId: null,
+      permissionsGranted: null,
+      errorMessage: null,
+      location: [],
+      photo: null,
+      imageUri: null,
+      imgSource: '',
+      city: '',
 
-      name: '',
+      loading: false,
+      updatesEnabled: false,
+      // editable: true,
+      uploading: false,
+      dialogVisible: false,
+
       dob: '',
-      address: '',
       gender: 'Male',
       phone: '',
     };
+
+    // this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
-  addData = async () => {
-    const {name, dob, address, gender, phone} = this.state
-    const uid = firebase.auth().currentUser.uid
-    const ref = firebase.database().ref(`/users/${uid}`)
-    await ref.set({
-      uid,
-      name,
-      dob,
-      address,
-      gender,
-      phone,
-      date: new Date().getTime()
-    })
-  }
+  componentDidMount = async () => {
+    const userId = await AsyncStorage.getItem('userid');
+    const userName = await AsyncStorage.getItem('user.name');
+    const userAddress = await AsyncStorage.getItem('user.address');
+    const userAvatar = await AsyncStorage.getItem('user.photo');
+    const userEmail = await AsyncStorage.getItem('user.email');
+    this.setState({userId, userName, userAvatar, userEmail, userAddress});
 
-  async componentDidMount(){
-    let data = await firebase.auth().currentUser
-    await this.setState({
-      data: data
-    })
-    console.log('data asli', this.state.data)
-  }
+    Database
+      .ref(`/user/${userId}`)
+      .on('value', snapshot => {
+        let data = snapshot.val();
+        console.log('snapshot data', data);
+      });
+  };
+
+  requestCameraPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      ]);
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  };
+
+  changeImage = async type => {
+    const Blob = RNFetchBlob.polyfill.Blob;
+    const fs = RNFetchBlob.fs;
+    window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+    window.Blob = Blob;
+    //   // enable this option so that the response data conversion handled automatically
+    //   auto: true,
+    //   // when receiving response data, the module will match its Content-Type header
+    //   // with strings in this array. If it contains any one of string in this array,
+    //   // the response body will be considered as binary data and the data will be stored
+    //   // in file system instead of in memory.
+    //   // By default, it only store response data to file system when Content-Type
+    //   // contains string `application/octet`.
+    //   binaryContentTypes: ['image/', 'video/', 'audio/', 'foo/'],
+    // }).build();
+
+    const options = {
+      title: 'Select Avatar',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+      mediaType: 'photo',
+    };
+
+    let cameraPermission =
+      (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA)) &&
+      PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      ) &&
+      PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      );
+    if (!cameraPermission) {
+      console.log('camera');
+      cameraPermission = await this.requestCameraPermission();
+    } else {
+      console.log('image');
+      ImagePicker.showImagePicker(options, response => { //option
+        console.log('xxx', response);
+        ToastAndroid.show(
+          'Rest asure, your photo is flying to the shiny cloud',
+          ToastAndroid.LONG,
+        );
+        let uploadBob = null;
+        const imageRef = Storage
+          .ref('avatar/' + this.state.userId)
+          .child('photo');
+        fs.readFile(response.path, 'base64')
+          .then(data => {
+            return Blob.build(data, {type: `;BASE64`});
+          })
+          .then(blob => {
+            uploadBob = blob;
+            return imageRef.put(blob, {contentType: `image/jpeg`});
+          })
+          .then(() => {
+            uploadBob.close();
+            return imageRef.getDownloadURL();
+          })
+          .then(url => {
+            ToastAndroid.show(
+              'Your cool avatar is being uploaded, its going back to your phone now',
+              ToastAndroid.LONG,
+            );
+            Database
+              .ref('user/' + this.state.userId)
+              .update({photo: url});
+            this.setState({userAvatar: url});
+            AsyncStorage.setItem('user.photo', this.state.userAvatar);
+          })
+
+          .catch(err => console.log(err));
+      });
+    }
+  };
+  // addData = async () => {
+  //   const {name, dob, address, gender, phone} = this.state
+  //   const uid = firebase.auth().currentUser.uid
+  //   const ref = firebase.database().ref(`/users/${uid}`)
+  //   await ref.set({
+  //     uid,
+  //     name,
+  //     dob,
+  //     address,
+  //     gender,
+  //     phone,
+  //     date: new Date().getTime()
+  //   })
+  // }
 
   render() {
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor="#029C9C" barStyle="light-content" />
         <View style={styles.header}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate('Profile')}>
             <Icon
               name="arrow-left"
               size={18}
@@ -90,34 +201,33 @@ class EditProfile extends Component {
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.photoSection}>
-            <View style={styles.photo}>
-              <Text
-                style={{
-                  fontSize: 10,
-                  color: 'white',
-                  fontFamily: 'AirbnbCerealLight',
-                }}>
-                Your photo
-              </Text>
-            </View>
-            <Text
-              style={{
-                fontSize: 18,
-                color: '#FD866E',
-                fontFamily: 'AirbnbCerealBold',
-                paddingLeft: 20,
-              }}>
-              Upload Your Avatar
-            </Text>
+              <View style={styles.photo}>
+                <Image
+                source={{uri: this.state.userAvatar}}
+                style={{height: 100, aspectRatio: 1 / 1, borderRadius: 130 / 2}}
+              />
+              </View>
+              <View>
+              <TouchableOpacity onPress={this.changeImage}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: '#FD866E',
+                    fontFamily: 'AirbnbCerealBold',
+                    paddingLeft: 20,
+                  }}>
+                  Upload Your Avatar
+                </Text>
+                </TouchableOpacity>
+              </View>
+            
           </View>
           <View style={styles.btnSection}>
             <View style={styles.btn}>
               <Text>Name</Text>
               <TextInput
                 placeholder="Full name"
-                onChangeText={(value, index) => {
-                  this.setState({name: value})
-                }}
+                value={this.state.userName}
                 style={{
                   borderBottomWidth: 0.5,
                   borderColor: 'gray',
@@ -126,7 +236,7 @@ class EditProfile extends Component {
                 }}
               />
             </View>
-            <View style={styles.btn}>
+            {/* <View style={styles.btn}>
               <Text>Date of Birth</Text>
               <DatePicker
                 style={{width: 150}}
@@ -136,13 +246,12 @@ class EditProfile extends Component {
                 format="YYYY-MM-DD"
                 confirmBtnText="Confirm"
                 cancelBtnText="Cancel"
-                
                 showIcon={false}
                 onDateChange={date => {
                   this.setState({dob: date});
                 }}
               />
-            </View>
+            </View> */}
             <View style={styles.btn}>
               <Text>Address</Text>
               <TextInput
@@ -170,8 +279,8 @@ class EditProfile extends Component {
             <View style={styles.btn}>
               <Text>Email</Text>
               <TextInput
-                editable={false}
-                value={this.state.data.email}
+                // editable={false}
+                value={this.state.userEmail}
                 style={{
                   borderBottomWidth: 0.5,
                   borderColor: 'gray',
@@ -195,7 +304,9 @@ class EditProfile extends Component {
           </View>
         </ScrollView>
         <View style={styles.floatingButton}>
-          <TouchableOpacity style={styles.button} onPress={() => this.addData()}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => this.props.navigation.navigate('Profile')}>
             <Text
               style={{
                 fontSize: 16,

@@ -11,26 +11,47 @@ import {
   ImageBackground,
   Picker,
   StatusBar,
+  ToastAndroid
 } from 'react-native';
 import {Icon} from 'react-native-elements';
+import {Database, Auth} from '../../config/Firebase/firebase';
+
 import AsyncStorage from '@react-native-community/async-storage';
 
-
 class Profile extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       idUser: null,
     };
   }
 
+  
+
   componentDidMount = async () => {
     const idUser = await AsyncStorage.getItem('userid');
     const fullName = await AsyncStorage.getItem('user.name');
     const address = await AsyncStorage.getItem('user.address');
-    console.log('huboo', await idUser)
-    this.setState({idUser, fullName, address})
-  }
+    const avatar = await AsyncStorage.getItem('user.photo');
+    console.log('huboo', await idUser);
+    this.setState({idUser, fullName, address, avatar});
+  };
+  
+  handleLogout = async () => {
+    await AsyncStorage.getItem('userid')
+      .then(async userid => {
+        Database.ref('user/' + userid).update({status: 'Offline'});
+        await AsyncStorage.clear();
+        Auth.signOut();
+        ToastAndroid.show('Logout Success! See you ...', ToastAndroid.LONG);
+      })
+      .catch(error =>
+        this.setState({
+          errorMessage: error.message,
+        }),
+      );
+    console.log('logut', this.handleLogout);
+  };
 
   render() {
     return (
@@ -38,14 +59,10 @@ class Profile extends Component {
         <StatusBar backgroundColor="#029C9C" barStyle="light-content" />
         <View style={styles.header}>
           <View style={styles.photo}>
-            <Text
-              style={{
-                fontSize: 16,
-                color: 'white',
-                fontFamily: 'AirbnbCerealLight',
-              }}>
-              Tap to change
-            </Text>
+            <Image
+              source={{uri: this.state.avatar}}
+              style={{height: 130, aspectRatio: 1 / 1, borderRadius: 130 / 2}}
+            />
           </View>
           <View style={styles.name}>
             <Text
@@ -72,9 +89,7 @@ class Profile extends Component {
           <View style={styles.btn}>
             <TouchableOpacity
               style={styles.touchBtn}
-              onPress={() =>
-                this.props.navigation.navigate('EditProfile')
-              }>
+              onPress={() => this.props.navigation.navigate('EditProfile')}>
               <Text
                 style={{
                   fontSize: 16,
@@ -100,7 +115,7 @@ class Profile extends Component {
             </TouchableOpacity>
           </View>
           <View style={styles.btn}>
-            <TouchableOpacity style={styles.touchBtn}>
+            <TouchableOpacity style={styles.touchBtn} onPress={this.handleLogout}>
               <Text
                 style={{
                   fontSize: 16,
@@ -132,13 +147,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   photo: {
-    marginTop: '20%',
     height: 130,
     aspectRatio: 1 / 1,
     borderRadius: 130 / 2,
     backgroundColor: 'gray',
     justifyContent: 'center',
-    alignItems: 'center',
   },
   name: {
     height: 50,
