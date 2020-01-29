@@ -77,8 +77,8 @@ Contact me at <ahmadridwan.3107@gmail.com>.
   <table>
     <tr>
       <td align="center">
-        <a href="https://github.com/kurniawandenyy">
-          <sub><b>Deny Kurniawan</b></sub>
+        <a href="https://github.com/pujakesuma/">
+          <sub><b>Ahmad Ridwan</b></sub>
         </a>
       </td>
     </tr>
