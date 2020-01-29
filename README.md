@@ -62,6 +62,8 @@ Project is created with:
 ## Screenshot
 ![1](https://user-images.githubusercontent.com/32631979/73351848-760eee00-42c2-11ea-8df3-8d4e7fb78d56.jpg)
 
+![2](https://user-images.githubusercontent.com/32631979/73352349-7c519a00-42c3-11ea-8244-e012ab582763.jpg)
+
 
 ## Release APK
 <a href="http://bit.ly/Find2us-Mobile-App">
